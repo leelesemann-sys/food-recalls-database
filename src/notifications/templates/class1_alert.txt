@@ -1,0 +1,43 @@
+================================================================================
+                      FOOD RECALL CLASS I ALERT
+================================================================================
+
+{{ count }} New Class I Recall{{ 's' if count > 1 else '' }} Detected
+
+IMPORTANT: Class I recalls involve situations where there is a reasonable
+probability that use of the product will cause serious adverse health
+consequences or death.
+
+================================================================================
+
+{% for recall in recalls %}
+--------------------------------------------------------------------------------
+[{{ recall.source | default('FDA', true) }}] RECALL NUMBER: {{ recall.recall_number | default('N/A', true) }}
+--------------------------------------------------------------------------------
+
+PRODUCT:
+{{ recall.product_description | default('Product description not available', true) }}
+
+REASON FOR RECALL:
+{{ recall.reason_for_recall | default('Not specified', true) }}
+
+RECALLING FIRM:
+{{ recall.recalling_firm | default('Not specified', true) }}
+
+DISTRIBUTION:
+{{ recall.distribution_pattern | default('Not specified', true) }}
+
+{% if recall.report_date %}
+REPORT DATE: {{ recall.report_date }}
+{% endif %}
+
+{% endfor %}
+================================================================================
+
+This is an automated alert from the Food Recall Alert System.
+
+For more information, visit:
+FDA:  https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts
+FSIS: https://www.fsis.usda.gov/recalls
+
+================================================================================

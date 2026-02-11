@@ -1,0 +1,46 @@
+# Secrets & credentials
+.env
+*.pem
+*.key
+
+# Application state
+state/
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large data files (keep in local only, not in git)
+data/input/**/*.json
+data/input/**/*.csv
+data/input/**/*.xlsx
+data/input/**/*.xls
+data/input/**/*.zip
+data/input/**/*.pdf
+data/output/parquet/*.parquet
+data/output/classification/*.xlsx
+data/output/excel/
+data/output/power-bi/
+data/output/presentations/
+
+# Binary / Office files
+*.pbix
+*.pptx
+*.docx
+~$*
+
+# Archive
+_archive/
+archiv/

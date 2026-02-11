@@ -1,0 +1,48 @@
+{
+    "name": "Pipeline_CDC_NORS",
+    "properties": {
+        "description": "Fetches CDC NORS outbreak data from the public API and stores in Data Lake",
+        "activities": [
+            {
+                "name": "Copy_CDC_NORS_Data",
+                "type": "Copy",
+                "description": "Copy CDC NORS data from REST API to Data Lake Gen2",
+                "inputs": [
+                    {
+                        "referenceName": "CDC_NORS_REST_API",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "DataLake_CDC_JSON",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "typeProperties": {
+                    "source": {
+                        "type": "RestSource",
+                        "httpRequestTimeout": "00:05:00",
+                        "requestInterval": "00.00:00:00.010",
+                        "requestMethod": "GET"
+                    },
+                    "sink": {
+                        "type": "JsonSink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        },
+                        "formatSettings": {
+                            "type": "JsonWriteSettings"
+                        }
+                    }
+                }
+            }
+        ],
+        "annotations": [
+            "CDC",
+            "NORS",
+            "FoodSafety",
+            "Outbreaks"
+        ]
+    }
+}

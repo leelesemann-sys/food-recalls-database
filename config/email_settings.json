@@ -1,0 +1,18 @@
+{
+  "smtp": {
+    "host": "smtp.office365.com",
+    "port": 587,
+    "use_tls": true
+  },
+  "sender": {
+    "email": "alerts@company.com",
+    "name": "FDA Recall Alert System"
+  },
+  "recipients": {
+    "class1_alerts": ["safety@company.com"]
+  },
+  "notification_settings": {
+    "enabled": true,
+    "max_retries": 3
+  }
+}

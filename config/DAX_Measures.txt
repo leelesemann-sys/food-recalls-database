@@ -1,0 +1,236 @@
+// ============================================================================
+// FOOD RECALL ANALYTICS - DAX MEASURES
+// ============================================================================
+// Copy these measures into Power BI Desktop
+// Create a new measure for each block below
+// ============================================================================
+
+// ============================================================================
+// RECALL METRICS
+// ============================================================================
+
+// Measure: Total Recalls
+Total Recalls = COUNTROWS(fact_recalls)
+
+// Measure: USA Recalls
+USA Recalls =
+CALCULATE(
+    COUNTROWS(fact_recalls),
+    fact_recalls[Source] IN {"FDA", "FSIS"}
+)
+
+// Measure: FDA Recalls
+FDA Recalls =
+CALCULATE(
+    COUNTROWS(fact_recalls),
+    fact_recalls[Source] = "FDA"
+)
+
+// Measure: FSIS Recalls
+FSIS Recalls =
+CALCULATE(
+    COUNTROWS(fact_recalls),
+    fact_recalls[Source] = "FSIS"
+)
+
+// ============================================================================
+// SEVERITY METRICS
+// ============================================================================
+
+// Measure: Class I Recalls (High Severity)
+Class I Recalls =
+CALCULATE(
+    COUNTROWS(fact_recalls),
+    dim_classification[USAClassLevel] = "Class I"
+)
+
+// Measure: Class II Recalls (Medium Severity)
+Class II Recalls =
+CALCULATE(
+    COUNTROWS(fact_recalls),
+    dim_classification[USAClassLevel] = "Class II"
+)
+
+// Measure: Class III Recalls (Low Severity)
+Class III Recalls =
+CALCULATE(
+    COUNTROWS(fact_recalls),
+    dim_classification[USAClassLevel] = "Class III"
+)
+
+// Measure: High Severity Percentage
+High Severity % =
+DIVIDE(
+    [Class I Recalls],
+    [Total Recalls],
+    0
+)
+
+// ============================================================================
+// TIME INTELLIGENCE METRICS
+// ============================================================================
+
+// Measure: Year-over-Year Growth
+Recalls YoY Growth =
+VAR CurrentYear = [Total Recalls]
+VAR PreviousYear =
+    CALCULATE(
+        [Total Recalls],
+        SAMEPERIODLASTYEAR(dim_date[Date])
+    )
+RETURN
+    DIVIDE(CurrentYear - PreviousYear, PreviousYear, 0)
+
+// Measure: Month-to-Date Recalls
+Recalls MTD =
+CALCULATE(
+    [Total Recalls],
+    DATESMTD(dim_date[Date])
+)
+
+// Measure: Year-to-Date Recalls
+Recalls YTD =
+CALCULATE(
+    [Total Recalls],
+    DATESYTD(dim_date[Date])
+)
+
+// Measure: Average Monthly Recalls
+Average Monthly Recalls =
+AVERAGEX(
+    VALUES(dim_date[Year]),
+    CALCULATE([Total Recalls]) / 12
+)
+
+// Measure: Rolling 12-Month Recalls
+Rolling 12M Recalls =
+CALCULATE(
+    [Total Recalls],
+    DATESINPERIOD(
+        dim_date[Date],
+        MAX(dim_date[Date]),
+        -12,
+        MONTH
+    )
+)
+
+// ============================================================================
+// CDC HEALTH IMPACT METRICS
+// ============================================================================
+
+// Measure: Total Outbreaks
+Total Outbreaks = COUNTROWS(fact_health_impact)
+
+// Measure: Total Illnesses
+Total Illnesses = SUM(fact_health_impact[Illnesses])
+
+// Measure: Total Hospitalizations
+Total Hospitalizations = SUM(fact_health_impact[Hospitalizations])
+
+// Measure: Total Deaths
+Total Deaths = SUM(fact_health_impact[Deaths])
+
+// Measure: Hospitalization Rate
+Hospitalization Rate =
+DIVIDE(
+    [Total Hospitalizations],
+    [Total Illnesses],
+    0
+)
+
+// Measure: Mortality Rate
+Mortality Rate =
+DIVIDE(
+    [Total Deaths],
+    [Total Illnesses],
+    0
+)
+
+// Measure: Average Illnesses per Outbreak
+Avg Illnesses per Outbreak =
+DIVIDE(
+    [Total Illnesses],
+    [Total Outbreaks],
+    0
+)
+
+// ============================================================================
+// GEOGRAPHIC METRICS
+// ============================================================================
+
+// Measure: States with Recalls
+States with Recalls =
+DISTINCTCOUNT(dim_geography[State])
+
+// Measure: Top State Recall Count
+Top State Recalls =
+MAXX(
+    VALUES(dim_geography[State]),
+    [Total Recalls]
+)
+
+// ============================================================================
+// PRODUCT METRICS
+// ============================================================================
+
+// Measure: Product Categories Affected
+Product Categories Affected =
+DISTINCTCOUNT(dim_product[ProductCategory])
+
+// Measure: Top Category
+Top Category =
+FIRSTNONBLANK(
+    TOPN(
+        1,
+        VALUES(dim_product[ProductCategory]),
+        [Total Recalls]
+    ),
+    1
+)
+
+// ============================================================================
+// COMPANY METRICS
+// ============================================================================
+
+// Measure: Companies with Recalls
+Companies with Recalls =
+DISTINCTCOUNT(fact_recalls[CompanyKey])
+
+// Measure: Repeat Offenders (Companies with >1 recall)
+Repeat Offenders =
+COUNTROWS(
+    FILTER(
+        SUMMARIZE(
+            fact_recalls,
+            fact_recalls[CompanyKey],
+            "RecallCount", COUNTROWS(fact_recalls)
+        ),
+        [RecallCount] > 1
+    )
+)
+
+// ============================================================================
+// CONDITIONAL FORMATTING MEASURES
+// ============================================================================
+
+// Measure: Severity Color
+Severity Color =
+SWITCH(
+    SELECTEDVALUE(dim_classification[SeverityLevel]),
+    "High", "#FF4444",
+    "Medium", "#FFAA00",
+    "Low", "#44AA44",
+    "#888888"
+)
+
+// Measure: YoY Indicator
+YoY Indicator =
+IF(
+    [Recalls YoY Growth] > 0,
+    "▲ Increasing",
+    IF(
+        [Recalls YoY Growth] < 0,
+        "▼ Decreasing",
+        "◆ Stable"
+    )
+)

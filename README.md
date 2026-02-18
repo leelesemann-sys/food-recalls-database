@@ -1,6 +1,8 @@
 # Food Recalls Database
 
-A multinational food safety analytics platform that integrates food recall data and health outcome data related to food-safety-incidents from six government agencies across the US, EU, and UK into a unified star schema data warehouse. Built on Azure (Data Lake Gen2, Synapse Analytics, Data Factory) with a Python ETL pipeline and Power BI reporting layer.
+> **Language:** English | [Deutsch](README.de.md)
+
+A multinational food safety analytics platform that integrates recall data from six government agencies across the US, EU, and UK into a unified star schema data warehouse. Built on Azure (Data Lake Gen2, Synapse Analytics, Data Factory) with a Python ETL pipeline and Power BI reporting layer.
 
 ## Architecture
 
